@@ -21,3 +21,4 @@ D:\SistemaColegio\Sistema\Sistema.Entidades\bin\Debug\Sistema.Entidades.pdb
 D:\SistemaColegio\Sistema\Sistema.Entidades\obj\Debug\Sistema.Entidades.csproj.CoreCompileInputs.cache
 D:\SistemaColegio\Sistema\Sistema.Entidades\obj\Debug\Sistema.Entidades.dll
 D:\SistemaColegio\Sistema\Sistema.Entidades\obj\Debug\Sistema.Entidades.pdb
+D:\SistemaColegio\Sistema\Sistema.Entidades\obj\Debug\Sistema.Entidades.csprojAssemblyReference.cache

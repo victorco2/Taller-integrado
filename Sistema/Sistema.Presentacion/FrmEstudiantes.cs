@@ -13,10 +13,13 @@ using System.IO;
 
 namespace Sistema.Presentacion
 {
-    public partial class FrmUsuario : Form
+    public partial class FrmEstudiantes : Form
     {
-        private string EmailAnt;
-        public FrmUsuario()
+        private string RutaOrigen;
+        private string RutaDestino;
+        private string Directorio = "D:\\sistema2\\";
+        private string NombreAnt;
+        public FrmEstudiantes()
         {
             InitializeComponent();
         }
@@ -24,12 +27,12 @@ namespace Sistema.Presentacion
         {
             try
             {
-                DgvListado.DataSource = NUsuario.Listar();
+                DgvListado.DataSource = NEstudiantes.Listar();
                 this.Formato();
                 this.Limpiar();
                 LblTotal.Text = "Total registros: " + Convert.ToString(DgvListado.Rows.Count);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 MessageBox.Show(ex.Message + ex.StackTrace);
             }
@@ -39,7 +42,7 @@ namespace Sistema.Presentacion
         {
             try
             {
-                DgvListado.DataSource = NUsuario.Buscar(TxtBuscar.Text);
+                DgvListado.DataSource = NEstudiantes.Buscar(TxtBuscar.Text);
                 this.Formato();
                 LblTotal.Text = "Total registros: " + Convert.ToString(DgvListado.Rows.Count);
             }
@@ -52,33 +55,32 @@ namespace Sistema.Presentacion
         private void Formato()
         {
             DgvListado.Columns[0].Visible = false;
-            DgvListado.Columns[2].Visible = false;
-            DgvListado.Columns[1].Width = 50;
-            DgvListado.Columns[3].Width = 100;
-            DgvListado.Columns[4].Width = 170;
-            DgvListado.Columns[5].Width = 100;
-            DgvListado.Columns[5].HeaderText = "Documento";
+            DgvListado.Columns[1].Visible = false;
+            DgvListado.Columns[2].Width = 100;
+            DgvListado.Columns[3].Width = 150;
+            DgvListado.Columns[4].Width = 150;
+            DgvListado.Columns[5].Width = 90;
             DgvListado.Columns[6].Width = 100;
-            DgvListado.Columns[6].HeaderText = "Número Doc.";
-            DgvListado.Columns[7].Width = 120;
-            DgvListado.Columns[7].HeaderText = "Dirección";
+            DgvListado.Columns[7].Width = 100;
             DgvListado.Columns[8].Width = 100;
-            DgvListado.Columns[8].HeaderText = "Teléfono";
-            DgvListado.Columns[9].Width = 120;
+            DgvListado.Columns[9].Width = 100;
+            DgvListado.Columns[10].Width = 100;
+            DgvListado.Columns[11].Width = 90;
+            DgvListado.Columns[12].Width = 90;
+
         }
         private void Limpiar()
         {
             TxtBuscar.Clear();
             TxtNombre.Clear();
             TxtId.Clear();
-            TxtNumDocumento.Clear();
-            TxtDireccion.Clear();
-            TxtTelefono.Clear();
-            TxtEmail.Clear();
-            TxtClave.Clear();
             BtnInsertar.Visible = true;
             BtnActualizar.Visible = false;
             ErrorIcono.Clear();
+            TxtImagen.Clear();
+            PicImagen.Image = null;
+            this.RutaDestino = "";
+            this.RutaOrigen = "";
 
             DgvListado.Columns[0].Visible = false;
             BtnActivar.Visible = false;
@@ -88,21 +90,20 @@ namespace Sistema.Presentacion
         }
         private void MensajeError(string Mensaje)
         {
-            MessageBox.Show(Mensaje, "Sistema de ventas", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(Mensaje, "Sistema de Calificaciones", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void MensajeOk(string Mensaje)
         {
-            MessageBox.Show(Mensaje, "Sistema de ventas", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(Mensaje, "Sistema de Calificaciones", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-        private void CargarRol()
+        private void CargarCategoria()
         {
             try
             {
-                CboRol.DataSource = NRol.Listar();
-                CboRol.ValueMember = "Id";
-                CboRol.DisplayMember = "nombre";
+                CboEstudiantes.DataSource = NEstudiantes.Seleccionar();
+                CboEstudiantes.ValueMember = "Id";
+                CboEstudiantes.DisplayMember = "Descripcion";
             }
             catch (Exception ex)
             {
@@ -110,12 +111,10 @@ namespace Sistema.Presentacion
             }
         }
 
-
-
-        private void FrmUsuario_Load(object sender, EventArgs e)
+        private void FrmCategoria_Load(object sender, EventArgs e)
         {
             this.Listar();
-            this.CargarRol();
+            this.CargarCategoria();
         }
 
         private void BtnBuscar_Click(object sender, EventArgs e)
@@ -125,82 +124,28 @@ namespace Sistema.Presentacion
 
         private void BtnInsertar_Click(object sender, EventArgs e)
         {
+            
             try
             {
                 string Rpta = "";
-                if (CboRol.Text == string.Empty || TxtNombre.Text == string.Empty || TxtEmail.Text ==string.Empty || TxtClave.Text == string.Empty)
+                if (TxtNombre.Text == string.Empty)
                 {
                     this.MensajeError("Falta ingresar algunos datos, serán remarcados.");
-                    ErrorIcono.SetError(CboRol,"Seleccione un rol.");
                     ErrorIcono.SetError(TxtNombre, "Ingrese un nombre.");
-                    ErrorIcono.SetError(TxtEmail,"Ingrese un email.");
-                    ErrorIcono.SetError(TxtClave, "Ingrese una clave de acceso.");
                 }
                 else
                 {
-                    Rpta = NUsuario.Insertar(Convert.ToInt32(CboRol.SelectedValue),TxtNombre.Text.Trim(), CboTipoDocumento.Text,TxtNumDocumento.Text.Trim(),TxtDireccion.Text.Trim(),TxtTelefono.Text.Trim(),TxtEmail.Text.Trim(),TxtClave.Text.Trim());
+                    Rpta = NEstudiantes.Insertar(TxtNombre.Text.Trim(), TxtApellidoPaterno.Text.Trim(), TxtApellidoMaterno.Text.Trim(),Convert.ToInt32(TxtRut.Text.Trim()), Convert.ToDateTime(TxtFechaNacimiento.Text.Trim()), Convert.ToInt32(CboEstudiantes.SelectedValue),TxtDireccion.Text.Trim(),Convert.ToInt32(TxtTelefono.Text.Trim()),TxtEmail.Text.Trim(), TxtImagen.Text.Trim());
+
                     if (Rpta.Equals("OK"))
                     {
                         this.MensajeOk("Se insertó de forma correcta el registro");
-                        this.Limpiar();
-                        this.Listar();
-                    }
-                    else
-                    {
-                        this.MensajeError(Rpta);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + ex.StackTrace);
-            }
-        }        
 
-        private void DgvListado_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            try
-            {
-                this.Limpiar();
-                BtnActualizar.Visible = true;
-                BtnInsertar.Visible = false;
-                TxtId.Text= Convert.ToString(DgvListado.CurrentRow.Cells["ID"].Value);
-                CboRol.SelectedValue = Convert.ToString(DgvListado.CurrentRow.Cells["idrol"].Value);
-                TxtNombre.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Nombre"].Value);
-                CboTipoDocumento.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Tipo_Documento"].Value);
-                TxtNumDocumento.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Num_Documento"].Value);
-                TxtDireccion.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Direccion"].Value);
-                TxtTelefono.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Telefono"].Value);
-                this.EmailAnt= Convert.ToString(DgvListado.CurrentRow.Cells["Email"].Value);
-                TxtEmail.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Email"].Value);
-                TabGeneral.SelectedIndex = 1;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Seleccione desde la celda nombre." + "| Error: " + ex.Message);
-            }
-
-        }
-
-        private void BtnActualizar_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string Rpta = "";
-                if (TxtId.Text == string.Empty || CboRol.Text == string.Empty || TxtNombre.Text == string.Empty || TxtEmail.Text == string.Empty)
-                {
-                    this.MensajeError("Falta ingresar algunos datos, serán remarcados.");
-                    ErrorIcono.SetError(CboRol, "Seleccione un rol.");
-                    ErrorIcono.SetError(TxtNombre, "Ingrese un nombre.");
-                    ErrorIcono.SetError(TxtEmail, "Ingrese un email.");
-                }
-                else
-                {
-                    Rpta = NUsuario.Actualizar(Convert.ToInt32(TxtId.Text),Convert.ToInt32(CboRol.SelectedValue), TxtNombre.Text.Trim(), CboTipoDocumento.Text, TxtNumDocumento.Text.Trim(), TxtDireccion.Text.Trim(), TxtTelefono.Text.Trim(),this.EmailAnt, TxtEmail.Text.Trim(), TxtClave.Text.Trim());
-                    if (Rpta.Equals("OK"))
-                    {
-                        this.MensajeOk("Se actualizó de forma correcta el registro");
-                        this.Limpiar();
+                        if (TxtImagen.Text != string.Empty)
+                        {
+                            this.RutaDestino = this.Directorio + TxtImagen.Text;
+                            File.Copy(this.RutaOrigen, this.RutaDestino);
+                        }
                         this.Listar();
                     }
                     else
@@ -220,12 +165,79 @@ namespace Sistema.Presentacion
             this.Limpiar();
             TabGeneral.SelectedIndex = 0;
         }
-        private void DgvListado_CellContentClick(object sender, DataGridViewCellEventArgs e)
+
+        private void DgvListado_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == DgvListado.Columns["Seleccionar"].Index)
+            try
             {
-                DataGridViewCheckBoxCell ChkEliminar = (DataGridViewCheckBoxCell)DgvListado.Rows[e.RowIndex].Cells["Seleccionar"];
-                ChkEliminar.Value = !Convert.ToBoolean(ChkEliminar.Value);
+                this.Limpiar();
+                BtnActualizar.Visible = true;
+                BtnInsertar.Visible = false;
+                TxtId.Text = Convert.ToString(DgvListado.CurrentRow.Cells["ID"].Value);
+                this.NombreAnt = Convert.ToString(DgvListado.CurrentRow.Cells["Nombre"].Value);
+                TxtNombre.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Nombre"].Value);
+                TxtApellidoPaterno.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Apellido Paterno"].Value);
+                TxtApellidoMaterno.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Apellido Materno"].Value);
+                TxtRut.Text =Convert.ToString(DgvListado.CurrentRow.Cells["Rut"].Value);
+                TxtFechaNacimiento.Text =Convert.ToString(DgvListado.CurrentRow.Cells["Fecha Nacimiento"].Value);
+                CboEstudiantes.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Descripcion"].Value);
+                TxtDireccion.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Direccion"].Value);
+                TxtTelefono.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Telefono"].Value);
+                TxtEmail.Text = Convert.ToString(DgvListado.CurrentRow.Cells["Email"].Value);
+                string Imagen;
+                Imagen = Convert.ToString(DgvListado.CurrentRow.Cells["Imagen"].Value);
+                if (Imagen != string.Empty)
+                {
+                    PicImagen.Image = Image.FromFile(this.Directorio + Imagen);
+                    TxtImagen.Text = Imagen;
+                }
+                else
+                {
+                    PicImagen.Image = null;
+                    TxtImagen.Text = "";
+                }
+                TabGeneral.SelectedIndex = 1;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Seleccione desde la celda nombre.");
+            }
+            
+        }
+
+        private void BtnActualizar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string Rpta = "";
+                if (TxtNombre.Text == string.Empty || TxtId.Text == string.Empty)
+                {
+                    this.MensajeError("Falta ingresar algunos datos, serán remarcados.");
+                    ErrorIcono.SetError(TxtNombre, "Ingrese un nombre.");
+                }
+                else
+                {
+                    Rpta = NEstudiantes.Actualizar(Convert.ToInt32(TxtId.Text.Trim()),this.NombreAnt,TxtNombre.Text.Trim(), TxtApellidoPaterno.Text.Trim(), TxtApellidoMaterno.Text.Trim(), Convert.ToInt32(TxtRut.Text.Trim()), Convert.ToDateTime(TxtFechaNacimiento.Text.Trim()), Convert.ToInt32(CboEstudiantes.SelectedValue), TxtDireccion.Text.Trim(), Convert.ToInt32(TxtTelefono.Text.Trim()), TxtEmail.Text.Trim(), TxtImagen.Text.Trim());
+                    if (Rpta.Equals("OK"))
+                    {
+                        this.MensajeOk("Se actualizó de forma correcta el registro");
+                        if (TxtImagen.Text != string.Empty && this.RutaOrigen != string.Empty)
+                        {
+                            this.RutaDestino = this.Directorio + TxtImagen.Text;
+                            File.Copy(this.RutaOrigen, this.RutaDestino);
+                        }
+                        this.Listar();
+                        TabGeneral.SelectedIndex = 0;
+                    }
+                    else
+                    {
+                        this.MensajeError(Rpta);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
             }
         }
 
@@ -247,6 +259,15 @@ namespace Sistema.Presentacion
             }
         }
 
+        private void DgvListado_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == DgvListado.Columns["Seleccionar"].Index)
+            {
+                DataGridViewCheckBoxCell ChkEliminar = (DataGridViewCheckBoxCell)DgvListado.Rows[e.RowIndex].Cells["Seleccionar"];
+                ChkEliminar.Value = !Convert.ToBoolean(ChkEliminar.Value);
+            }
+        }
+
         private void BtnEliminar_Click(object sender, EventArgs e)
         {
             try
@@ -257,54 +278,20 @@ namespace Sistema.Presentacion
                 {
                     int Codigo;
                     string Rpta = "";
+                    string Imagen = "";
 
                     foreach (DataGridViewRow row in DgvListado.Rows)
                     {
                         if (Convert.ToBoolean(row.Cells[0].Value))
                         {
                             Codigo = Convert.ToInt32(row.Cells[1].Value);
-                            Rpta = NUsuario.Eliminar(Codigo);
+                            Imagen = Convert.ToString(row.Cells[9].Value);
+                            Rpta = NEstudiantes.Eliminar(Codigo);
 
                             if (Rpta.Equals("OK"))
                             {
-                                this.MensajeOk("Se eliminó el registro: " + Convert.ToString(row.Cells[4].Value));
-                            }
-                            else
-                            {
-                                this.MensajeError(Rpta);
-                            }
-                        }
-                    }
-                    this.Listar();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + ex.StackTrace);
-            }
-        }
-
-        private void BtnDesactivar_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                DialogResult Opcion;
-                Opcion = MessageBox.Show("Realmente deseas desactivar el(los) registro(s)?", "Sistema de ventas", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
-                if (Opcion == DialogResult.OK)
-                {
-                    int Codigo;
-                    string Rpta = "";
-
-                    foreach (DataGridViewRow row in DgvListado.Rows)
-                    {
-                        if (Convert.ToBoolean(row.Cells[0].Value))
-                        {
-                            Codigo = Convert.ToInt32(row.Cells[1].Value);
-                            Rpta = NUsuario.Desactivar(Codigo);
-
-                            if (Rpta.Equals("OK"))
-                            {
-                                this.MensajeOk("Se desactivó el registro: " + Convert.ToString(row.Cells[4].Value));
+                                this.MensajeOk("Se eliminó el registro: " + Convert.ToString(row.Cells[2].Value));
+                                File.Delete(this.Directorio + Imagen);
                             }
                             else
                             {
@@ -337,11 +324,11 @@ namespace Sistema.Presentacion
                         if (Convert.ToBoolean(row.Cells[0].Value))
                         {
                             Codigo = Convert.ToInt32(row.Cells[1].Value);
-                            Rpta = NUsuario.Activar(Codigo);
+                            Rpta = NEstudiantes.Activar(Codigo);
 
                             if (Rpta.Equals("OK"))
                             {
-                                this.MensajeOk("Se activó el registro: " + Convert.ToString(row.Cells[4].Value));
+                                this.MensajeOk("Se activó el registro: " + Convert.ToString(row.Cells[11].Value));
                             }
                             else
                             {
@@ -355,6 +342,60 @@ namespace Sistema.Presentacion
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
+
+        private void BtnDesactivar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                DialogResult Opcion;
+                Opcion = MessageBox.Show("Realmente deseas desactivar el(los) registro(s)?", "Sistema de calificaciones", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                if (Opcion == DialogResult.OK)
+                {
+                    int Codigo;
+                    string Rpta = "";
+
+                    foreach (DataGridViewRow row in DgvListado.Rows)
+                    {
+                        if (Convert.ToBoolean(row.Cells[0].Value))
+                        {
+                            Codigo = Convert.ToInt32(row.Cells[1].Value);
+                            Rpta = NEstudiantes.Desactivar(Codigo);
+
+                            if (Rpta.Equals("OK"))
+                            {
+                                this.MensajeOk("Se desactivó el registro: " + Convert.ToString(row.Cells[11].Value));
+                            }
+                            else
+                            {
+                                this.MensajeError(Rpta);
+                            }
+                        }
+                    }
+                    this.Listar();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
+
+        private void TxtDescripcion_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void BtnCargarImagen_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog file = new OpenFileDialog();
+            file.Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png";
+            if (file.ShowDialog() == DialogResult.OK)
+            {
+                PicImagen.Image = Image.FromFile(file.FileName);
+                TxtImagen.Text = file.FileName.Substring(file.FileName.LastIndexOf("\\") + 1);
+                this.RutaOrigen = file.FileName;
             }
         }
     }

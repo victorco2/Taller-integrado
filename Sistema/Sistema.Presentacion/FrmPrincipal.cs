@@ -111,7 +111,9 @@ namespace Sistema.Presentacion
 
         private void CategoríasToolStripMenuItem_Click(object sender, EventArgs e)
         {
-         
+            FrmEstudiantes frm = new FrmEstudiantes();
+            frm.MdiParent = this;
+            frm.Show();
         }
 
         private void ArtículosToolStripMenuItem_Click(object sender, EventArgs e)
